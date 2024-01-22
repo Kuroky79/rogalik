@@ -1,0 +1,21 @@
+/* styles.css */
+* { box-sizing: border-box; }
+body, html { height: 100%; margin: 0; }
+body { background-color: #000000; color: #ffffff; }
+h1 { font-family: "Playfair Display"; font-size: 30px; padding: 10px 0px; margin: 0px; }
+.field-box { border: 2px solid #d0d0d0; float: left; }
+.field { position: relative; width: 800px; height: 570px; }
+.tile {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background-size: cover;
+}
+.tile-wall { background-image: url('images/tile-wall.png'); }
+.tile-enemy { background-image: url('images/tile-enemy.png'); }
+.tile-myhero { background-image: url('images/tile-myhero.png'); }
+.tile-potion { background-image: url('images/tile-potion.png'); }
+.tile-sword { background-image: url('images/tile-sword.png'); }
+.tile-empty { background-image: url('images/tile-enemy.png'); }
+.tile-field { background-image: url('images/tile-field.png'); }
+
