@@ -13,20 +13,29 @@ $(document).ready(function () {
 });
 
 function initGame() {
-    generateMap();
-    placePlayer();
-    placeEnemies(10);
-    placeItems(2, "sword");
-    placeItems(10, "health-potion");
-    drawMap();
-    setupControls();
+    generateMap(function() {
+        placePlayer();
+        placeEnemies(10);
+        placeItems(2, "sword");
+        placeItems(10, "health-potion");
+        drawMap();
+        setupControls();
+    });
 }
 
-function generateMap() {
+function generateMap(callback) {
     map = Array.from({ length: height }, () => Array(width).fill('#'));
 
     generateRooms();
     generatePassages();
+
+    // Check if a callback is provided before using it
+    if (callback) {
+        // Add a delay to simulate asynchronous map generation
+        setTimeout(function() {
+            callback();
+        }, 100);
+    }
 }
 
 function generateRooms() {
@@ -163,27 +172,35 @@ function moveEntity(entity, dx, dy, symbol) {
 
 function attack() {
     for (var i = 0; i < enemies.length; i++) {
-        if (isAdjacent(player, enemies[i])) {
-            reduceEnemyHealth(enemies[i]);
+        if (isInRange(player, enemies[i], 2)) {
+            reduceEnemyHealth(i); // Pass the index of the enemy to reduce health
         }
     }
 }
 
-function reduceEnemyHealth(enemy) {
-    var enemyHealth = 1;
-    enemyHealth--;
 
-    if (enemyHealth <= 0) {
-        removeEnemy(enemy);
+function isInRange(entity1, entity2, range) {
+    return (
+        Math.abs(entity1.x - entity2.x) <= range &&
+        Math.abs(entity1.y - entity2.y) <= range
+    );
+}
+
+function reduceEnemyHealth(enemyIndex) {
+    // Check if the enemy still has health
+    if (enemies[enemyIndex].health > 0) {
+        enemies[enemyIndex].health--;
+
+        if (enemies[enemyIndex].health <= 0) {
+            removeEnemy(enemyIndex);
+        }
     }
 }
 
-function removeEnemy(enemy) {
+function removeEnemy(enemyIndex) {
+    var enemy = enemies[enemyIndex];
     map[enemy.y][enemy.x] = '.';
-    var index = enemies.indexOf(enemy);
-    if (index !== -1) {
-        enemies.splice(index, 1);
-    }
+    enemies.splice(enemyIndex, 1);
 }
 
 function checkGameConditions() {
@@ -217,7 +234,19 @@ function restorePlayerHealth() {
 }
 
 function reducePlayerHealth() {
-    player.health = (player.health || 0) - 1;
+    // Check if the player is not adjacent to any enemies before reducing health
+    var playerIsSafe = true;
+    for (var i = 0; i < enemies.length; i++) {
+        if (isAdjacent(player, enemies[i])) {
+            playerIsSafe = false;
+            break;
+        }
+    }
+
+    if (playerIsSafe) {
+        // Player is not adjacent to any enemies, reduce health
+        player.health = (player.health || 0) - 1;
+    }
 }
 
 function endGame() {
